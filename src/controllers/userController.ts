@@ -1,40 +1,42 @@
 //import prisma client
+import { Context } from "elysia";
 import prisma from "../../prisma/client";
+import { UserService } from "../service/userService";
+import { ResponseError } from "../error/response-error";
 
-/**
- * Getting all posts
- */
-export async function getUsersByid(id: number) {
-  try {
-    //get users by id
-    const user = await prisma.user.findUnique({
-      where: {
-        id: id,
-      },
-      omit: {
-        password: true,
-      },
-    });
-
-    //return response json
-    return {
-      data: user,
-    };
-  } catch (e: unknown) {
-    console.error(`Error getting users: ${e}`);
+export class UserController {
+  static async getUsersbyid(id: number, ctx: Context) {
+    try {
+      //get users by id
+      const response = await UserService.getById(id);
+      ctx.set.status = 200;
+      return {
+        data: response,
+      };
+    } catch (errors: any) {
+      throw errors;
+    }
   }
-}
 
-export async function getUsers() {
-  try {
-    //get users by id
-    const user = await prisma.user.findMany({ orderBy: { id: "desc" } });
+  static async getUsers() {
+    try {
+      //get all users
+      const user = await prisma.user.findMany({ orderBy: { id: "desc" } });
 
-    //return response json
-    return {
-      data: user,
-    };
-  } catch (e: unknown) {
-    console.error(`Error getting posts: ${e}`);
+      //return response json
+      return {
+        data: user,
+        select: {
+          id: true,
+          name: true,
+          username: true,
+          email: true,
+          updatedAt: true,
+          createdAt: true,
+        },
+      };
+    } catch (e: unknown) {
+      console.error(`Error getting posts: ${e}`);
+    }
   }
 }
