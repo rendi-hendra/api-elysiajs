@@ -16,4 +16,10 @@ export class UserService {
 
     return toUserResponse(user);
   }
+
+  static async getAll(): Promise<UserResponse[]> {
+    const user = await prisma.user.findMany({ orderBy: { id: "desc" } });
+
+    return user.map((user) => toUserResponse(user));
+  }
 }

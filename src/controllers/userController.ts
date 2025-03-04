@@ -1,41 +1,37 @@
-//import prisma client
 import { Context } from "elysia";
-import prisma from "../../prisma/client";
 import { UserService } from "../service/userService";
 import { ResponseError } from "../error/response-error";
 
 export class UserController {
-  static async getUsersbyid(id: number, ctx: Context) {
+  static async getUsersbyid(id: string, ctx: Context) {
     try {
-      //get users by id
-      const response = await UserService.getById(id);
+      const userId = parseInt(id);
+      if (isNaN(userId)) {
+        throw new ResponseError(400, "Invalid user ID");
+      }
+      const response = await UserService.getById(userId);
       ctx.set.status = 200;
       return {
         data: response,
       };
     } catch (errors: any) {
-      throw errors;
+      if (errors instanceof ResponseError) {
+        throw errors; // ⬅ Langsung throw tanpa modifikasi
+      }
+      console.error(errors);
+      throw new ResponseError(500, "Internal Server Error");
     }
   }
 
-  static async getUsers() {
+  static async getUsers(ctx: Context) {
     try {
       //get all users
-      const user = await prisma.user.findMany({ orderBy: { id: "desc" } });
-
-      //return response json
+      const response = await UserService.getAll();
+      ctx.set.status = 200;
       return {
-        data: user,
-        select: {
-          id: true,
-          name: true,
-          username: true,
-          email: true,
-          updatedAt: true,
-          createdAt: true,
-        },
+        data: response,
       };
-    } catch (e: unknown) {
+    } catch (e: any) {
       console.error(`Error getting posts: ${e}`);
     }
   }
