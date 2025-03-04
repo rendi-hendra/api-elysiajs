@@ -3,7 +3,7 @@ import { Elysia, t } from "elysia";
 import { userModel } from "../schema/userSchema";
 import { UserService } from "../service/userService";
 
-const routes = new Elysia({ prefix: "/api" })
+export const userRoute = new Elysia({ prefix: "/api" })
   .use(userModel)
   .get(
     "/users/:id",
@@ -40,5 +40,3 @@ const routes = new Elysia({ prefix: "/api" })
       body: "register",
     }
   );
-
-export default routes;
