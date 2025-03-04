@@ -11,6 +11,7 @@ export type UserResponse = {
 };
 
 export type CreateUserRequest = {
+  name: string;
   username: string;
   email: string;
   password: string;
