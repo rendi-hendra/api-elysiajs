@@ -1,16 +1,44 @@
 //import elysia
-import { Elysia } from "elysia";
-import { UserController } from "../controllers/userController";
-import { UserRegisterSchema } from "../schema/userSchema";
+import { Elysia, t } from "elysia";
+import { userModel } from "../schema/userSchema";
+import { UserService } from "../service/userService";
 
-const routes = new Elysia({ prefix: "/api" });
-
-routes.get("/users/:id", (ctx) =>
-  UserController.getUsersbyid(ctx.params.id, ctx)
-);
-routes.get("/users", (ctx) => UserController.getUsers(ctx));
-routes.post("/users", (ctx) => UserController.register(ctx.body, ctx), {
-  body: UserRegisterSchema,
-});
+const routes = new Elysia({ prefix: "/api" })
+  .use(userModel)
+  .get(
+    "/users/:id",
+    async ({ params, set }) => {
+      const response = await UserService.getById(params.id);
+      set.status = 200;
+      return {
+        data: response,
+      };
+    },
+    {
+      params: t.Object({
+        id: t.Number(),
+      }),
+    }
+  )
+  .get("/users", async ({ set }) => {
+    const response = await UserService.getAll();
+    set.status = 200;
+    return {
+      data: response,
+    };
+  })
+  .post(
+    "/users",
+    async ({ body, set }) => {
+      const response = await UserService.register(body);
+      set.status = 201;
+      return {
+        data: response,
+      };
+    },
+    {
+      body: "register",
+    }
+  );
 
 export default routes;

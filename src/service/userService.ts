@@ -22,7 +22,7 @@ export class UserService {
   }
 
   static async getAll(): Promise<UserResponse[]> {
-    const user = await prisma.user.findMany({ orderBy: { id: "desc" } });
+    const user = await prisma.user.findMany();
 
     return user.map((user) => toUserResponse(user));
   }
